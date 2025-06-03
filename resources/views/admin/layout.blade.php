@@ -15,11 +15,6 @@
         rel="stylesheet"
     />
 
-<<<<<<< HEAD
-=======
-    <!-- Alpine.js -->
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
->>>>>>> e4c35a997968a6d16322236953a65c25718c23d4
 
     <!-- Vite-compiled CSS/JS -->
     @vite([
@@ -36,12 +31,9 @@
             display: none !important;
         }
     </style>
-<<<<<<< HEAD
 
     <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/min/moment.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/moment-timezone@0.5.43/builds/moment-timezone-with-data.min.js"></script>
-=======
->>>>>>> e4c35a997968a6d16322236953a65c25718c23d4
 </head>
 
 <body class="bg-white text-gray-800 antialiased">
@@ -88,7 +80,6 @@
                 </button>
             </div>
 
-<<<<<<< HEAD
             <nav class="flex-1">
                 <ul class="space-y-1">
                     <li>
@@ -147,108 +138,6 @@
                         </a>
                     </li>
                 </ul>
-=======
-            <nav class="flex flex-col px-4 py-6 space-y-2">
-                <a
-                    href="{{ route('admin.dashboard') }}"
-                    class="flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors
-                           {{ request()->routeIs('admin.dashboard') ? 'bg-blue-200 text-blue-800' : 'bg-blue-600 hover:bg-blue-500' }}"
-                >
-                    <svg class="w-5 h-5 mr-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
-                         viewBox="0 0 24 24" stroke="currentColor"
-                    >
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M3 12l2-2m0 0l7-7 7 7M13 5v6h6" />
-                    </svg>
-                    <span class="{{ request()->routeIs('admin.dashboard') ? 'text-blue-800' : 'text-white' }}">Dashboard</span>
-                </a>
-
-                <a
-                    href="{{ route('admin.appointments.index') }}"
-                    class="flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors
-                           {{ request()->routeIs('admin.appointments.index') || request()->routeIs('admin.appointments.show') ? 'bg-blue-200 text-blue-800' : 'bg-blue-600 hover:bg-blue-500' }}"
-                >
-                    <svg class="w-5 h-5 mr-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
-                         viewBox="0 0 24 24" stroke="currentColor"
-                    >
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M8 7V3m8 4V3m-9 8h10m-11 4h12a1 1 0 001-1V7a1 1 0 00-1-1H5a1 1 0 00-1 1v11a1 1 0 001 1z" />
-                    </svg>
-                    <span class="{{ request()->routeIs('admin.appointments.index') || request()->routeIs('admin.appointments.show') ? 'text-blue-800' : 'text-white' }}">Appointments</span>
-                </a>
-
-                <a
-                    href=""
-                    class="flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors
-                           {{ request()->routeIs('admin.appointments.calendar') ? 'bg-blue-200 text-blue-800' : 'bg-blue-600 hover:bg-blue-500' }}"
-                >
-                    <svg class="w-5 h-5 mr-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
-                         viewBox="0 0 24 24" stroke="currentColor"
-                    >
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M8 7V3m8 4V3m-9 8h10m-11 4h12a1 1 0 001-1V7a1 1 0 00-1-1H5a1 1 0 00-1 1v11a1 1 0 001 1z" />
-                    </svg>
-                    <span class="{{ request()->routeIs('admin.appointments.calendar') ? 'text-blue-800' : 'text-white' }}">Calendar</span>
-                </a>
-
-                <a
-                    href="{{ route('admin.services.index') }}"
-                    class="flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors
-                           {{ request()->routeIs('admin.services.index') ? 'bg-blue-200 text-blue-800' : 'bg-blue-600 hover:bg-blue-500' }}"
-                >
-                    <svg class="w-5 h-5 mr-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
-                         viewBox="0 0 24 24" stroke="currentColor"
-                    >
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2-1.343-2-3-2zM7 12a5 5 0 0110 0v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6z" />
-                    </svg>
-                    <span class="{{ request()->routeIs('admin.services.index') ? 'text-blue-800' : 'text-white' }}">Services</span>
-                </a>
-
-                <a
-                    href="{{ route('admin.clients.index') }}"
-                    class="flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors
-                           {{ request()->routeIs('admin.clients.index') ? 'bg-blue-200 text-blue-800' : 'bg-blue-600 hover:bg-blue-500' }}"
-                >
-                    <svg class="w-5 h-5 mr-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
-                         viewBox="0 0 24 24" stroke="currentColor"
-                    >
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M16 7a4 4 0 01-8 0 4 4 0 018 0zM12 14c4.418 0 8 1.79 8 4v1H4v-1c0-2.21 3.582-4 8-4z" />
-                    </svg>
-                    <span class="{{ request()->routeIs('admin.clients.index') ? 'text-blue-800' : 'text-white' }}">Clients</span>
-                </a>
-
-                <a
-                    href=""
-                    class="flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors
-                           {{ request()->routeIs('admin.users.index') ? 'bg-blue-200 text-blue-800' : 'bg-blue-600 hover:bg-blue-500' }}"
-                >
-                    <svg class="w-5 h-5 mr-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
-                         viewBox="0 0 24 24" stroke="currentColor"
-                    >
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M5.121 17.804A13.937 13.937 0 0112 15c2.528 0 4.9.68 6.879 1.804M15 11a3 3 0 10-6 0 3 3 0 006 0z" />
-                    </svg>
-                    <span class="{{ request()->routeIs('admin.users.index') ? 'text-blue-800' : 'text-white' }}">Users</span>
-                </a>
-
-                <div class="border-t border-blue-500 my-4"></div>
-
-                <a
-                    href=""
-                    class="flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors
-                           {{ request()->routeIs('admin.settings') ? 'bg-blue-200 text-blue-800' : 'bg-blue-600 hover:bg-blue-500' }}"
-                >
-                    <svg class="w-5 h-5 mr-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
-                         viewBox="0 0 24 24" stroke="currentColor"
-                    >
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M12 1v2m0 18v2m11-11h-2M3 12H1m16.364 6.364l-1.414-1.414M6.05 6.05L4.636 4.636m0 14.728l1.414-1.414M18.364 6.364l-1.414 1.414" />
-                    </svg>
-                    <span class="{{ request()->routeIs('admin.settings') ? 'text-blue-800' : 'text-white' }}">Settings</span>
-                </a>
->>>>>>> e4c35a997968a6d16322236953a65c25718c23d4
             </nav>
         </aside>
 
