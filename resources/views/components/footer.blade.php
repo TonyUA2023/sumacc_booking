@@ -1,4 +1,4 @@
-<footer id="footer" class="bg-black text-slate-300 py-16 md:py-20">
+<footer id="footer" class="bg-black text-slate-300 py-16 md:py-20 overflow-x-hidden overflow-y-hidden">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8">
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 md:gap-8 xl:gap-12">
 

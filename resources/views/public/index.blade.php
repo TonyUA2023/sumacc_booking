@@ -1,49 +1,118 @@
 @extends('public.layout')
 
 @section('content')
+{{-- resources/views/partials/hero.blade.php (ó donde tengas tu sección) --}}
 <section
   id="hero"
-  class="relative h-screen bg-cover bg-center flex items-center justify-center"
-  style="background-image: url('{{ asset('hero/bgHero.jpg') }}');"
-  data-aos="fade-in" data-aos-duration="1000">
+  class="relative h-screen w-full overflow-hidden"
+  data-aos="fade-in"
+  data-aos-duration="1000"
+>
+  {{-- ================================================
+       1) Tres franjas diagonales que cubren 100% del hero
+       ================================================ --}}
+  <div class="absolute inset-0 flex flex-col">
+    <!-- Primera franja (parte superior) -->
+    <div
+      class="relative flex-1 overflow-hidden"
+      style="clip-path: polygon(0 0, 100% 0, 100% 70%, 0 100%);"
+    >
+      <img
+        src="{{ asset('hero/carCd.webp') }}"
+        alt="Imagen 1"
+        class="absolute inset-0 w-full h-full object-cover"
+      />
+    </div>
 
+    <!-- Segunda franja (parte central) -->
+    <div
+      class="relative flex-1 overflow-hidden"
+      style="clip-path: polygon(0 15%, 100% 0, 100% 85%, 0 100%);"
+    >
+      <img
+        src="{{ asset('hero/bg-auto-hero.jpg') }}"
+        alt="Imagen 2"
+        class="absolute inset-0 w-full h-full object-cover"
+      />
+    </div>
+
+    <!-- Tercera franja (parte inferior) -->
+    <div
+      class="relative flex-1 overflow-hidden"
+      style="clip-path: polygon(0 15%, 100% 0, 100% 100%, 0 100%);"
+    >
+      <img
+        src="{{ asset('hero/carDoble.webp') }}"
+        alt="Imagen 3"
+        class="absolute inset-0 w-full h-full object-cover"
+      />
+    </div>
+  </div>
+
+  {{-- ================================================
+       2) Overlay oscuro con degradado para resaltar el texto
+       ================================================ --}}
   <div class="absolute inset-0 bg-gradient-to-br from-slate-900 via-black opacity-85"></div>
-  <div
-    class="container mx-auto h-full relative z-10 flex flex-col lg:flex-row items-center justify-center lg:justify-between px-4 text-center lg:text-left"
-    data-aos="fade-up" data-aos-delay="300">
 
+  {{-- ================================================
+       3) Contenedor de texto y botones (tipografía refinada)
+       ================================================ --}}
+  <div
+    class="container mx-auto relative z-10 flex flex-col lg:flex-row 
+           items-center justify-center lg:justify-between h-full px-4 
+           text-center lg:text-left"
+    data-aos="fade-up"
+    data-aos-delay="300"
+  >
     <div class="lg:w-1/2 xl:w-3/5 space-y-6 lg:pr-10">
       <h1
-        class="text-4xl sm:text-5xl md:text-6xl font-extrabold text-slate-100 uppercase leading-tight tracking-tight"
-        data-aos="fade-right" data-aos-delay="500">
+        class="text-3xl sm:text-4xl md:text-5xl font-extrabold italic 
+               text-slate-100 leading-snug tracking-normal"
+        data-aos="fade-right"
+        data-aos-delay="500"
+      >
         <span class="block">Premium Hand Wash</span>
         <span class="block">&amp; Detailing</span>
         <span class="block text-sky-400">Deliver Door To Door</span>
       </h1>
+
       <p
-        class="mt-4 text-lg md:text-xl text-slate-300 max-w-lg mx-auto lg:mx-0"
-        data-aos="fade-right" data-aos-delay="700">
+        class="mt-3 text-base md:text-lg text-slate-300 max-w-lg mx-auto lg:mx-0"
+        data-aos="fade-right"
+        data-aos-delay="700"
+      >
         At Sumacc, we bring professional car care right to your home or office.
         Using advanced techniques and premium products, your vehicle will look
         stunning without you lifting a finger.
       </p>
+
       <div
-        class="mt-8 flex flex-col sm:flex-row justify-center lg:justify-start space-y-4 sm:space-y-0 sm:space-x-4"
-        data-aos="fade-right" data-aos-delay="900">
+        class="mt-6 flex flex-col sm:flex-row justify-center lg:justify-start 
+               space-y-3 sm:space-y-0 sm:space-x-3"
+        data-aos="fade-right"
+        data-aos-delay="900"
+      >
         <a
           href="/detailing"
-          class="px-8 py-3 bg-sky-500 text-white font-semibold uppercase rounded-lg shadow-lg
-                 transform transition-all duration-300 ease-in-out
-                 hover:bg-sky-600 hover:scale-105 hover:shadow-sky-400/50 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50"
-          data-aos="zoom-in" data-aos-delay="1100">
+          class="px-6 py-2 bg-sky-500 text-white font-semibold uppercase 
+                 rounded-lg shadow-lg transform transition-all duration-300 ease-in-out 
+                 hover:bg-sky-600 hover:scale-105 hover:shadow-sky-400/50 
+                 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50 text-sm"
+          data-aos="zoom-in"
+          data-aos-delay="1100"
+        >
           Book Online
         </a>
         <a
           href="#services"
-          class="px-8 py-3 border-2 border-sky-500 text-sky-400 font-semibold uppercase rounded-lg shadow-md
-                 transform transition-all duration-300 ease-in-out
-                 hover:bg-sky-500 hover:text-slate-900 hover:scale-105 hover:shadow-sky-500/30 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50"
-          data-aos="zoom-in" data-aos-delay="1300">
+          class="px-6 py-2 border-2 border-sky-500 text-sky-400 
+                 font-semibold uppercase rounded-lg shadow-md transform 
+                 transition-all duration-300 ease-in-out hover:bg-sky-500 
+                 hover:text-slate-900 hover:scale-105 hover:shadow-sky-500/30 
+                 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50 text-sm"
+          data-aos="zoom-in"
+          data-aos-delay="1300"
+        >
           Our Services
         </a>
       </div>
@@ -229,7 +298,7 @@
             x-transition:leave="transition ease-in duration-200 absolute"
             x-transition:leave-start="opacity-100 transform scale-100"
             x-transition:leave-end="opacity-0 transform scale-95"
-            src="{{ asset('media/hero-maintenance.jpg') }}" alt="Mobile Detailing" class="rounded-lg shadow-xl shadow-sky-900/40 max-w-md w-full object-cover" />
+            src="{{ asset('why/premwash.jpg') }}" alt="Mobile Detailing" class="rounded-lg shadow-xl shadow-sky-900/40 max-w-md w-full object-cover" />
         </template>
         <template x-if="activeTab === 'detailing'">
           <img
@@ -240,8 +309,12 @@
             x-transition:leave="transition ease-in duration-200 absolute"
             x-transition:leave-start="opacity-100 transform scale-100"
             x-transition:leave-end="opacity-0 transform scale-95"
-            src="{{ asset('media/hero-detailing.jpg') }}" alt="Deep Cleaning" class="rounded-lg shadow-xl shadow-sky-900/40 max-w-md w-full object-cover" />
+            src="{{ asset('why/CamionetaNegra.webp') }}"
+            alt="Deep Cleaning"
+            class="rounded-lg shadow-xl shadow-sky-900/40 max-w-md w-full h-64 object-cover"
+          />
         </template>
+
         <template x-if="activeTab === 'diagnostic'">
           <img
             x-show="activeTab === 'diagnostic'"
@@ -251,8 +324,12 @@
             x-transition:leave="transition ease-in duration-200 absolute"
             x-transition:leave-start="opacity-100 transform scale-100"
             x-transition:leave-end="opacity-0 transform scale-95"
-            src="{{ asset('media/hero-polish.jpg') }}" alt="Detail + Polish" class="rounded-lg shadow-xl shadow-sky-900/40 max-w-md w-full object-cover" />
+            src="{{ asset('why/carDoble.webp') }}"
+            alt="Detail + Polish"
+            class="rounded-lg shadow-xl shadow-sky-900/40 max-w-md w-full h-64 object-cover"
+          />
         </template>
+
       </div>
     </div>
   </div>
@@ -1060,7 +1137,7 @@
   </div>
 </section>
 
-<section id="contact" class="bg-black text-slate-200 py-16 md:py-20">
+<section id="contact" class="bg-black text-slate-200 py-16 md:py-20 overflow-x-hidden overflow-y-hidden">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center mb-12 md:mb-16">
       <h2 class="text-4xl sm:text-5xl font-bold text-sky-400" data-aos="fade-up">Get In Touch</h2>
