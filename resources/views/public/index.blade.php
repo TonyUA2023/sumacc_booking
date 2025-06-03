@@ -335,6 +335,55 @@
   </div>
 </section>
 
+<section id="service-area" class="bg-black text-slate-200 py-16 md:py-20 border-t border-slate-800">
+  <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12 md:mb-16">
+      <h2 class="text-4xl sm:text-5xl font-bold text-sky-400" data-aos="fade-up">Our Service Area</h2>
+      <p class="mt-4 text-lg text-slate-400 max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="100">
+        We proudly offer premium mobile detailing throughout Seattle and its surrounding cities.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-10 lg:gap-12 max-w-5xl mx-auto">
+      @php
+      $locations = [
+        ['name' => 'Seattle', 'delay' => 100],
+        ['name' => 'Bellevue', 'delay' => 150],
+        ['name' => 'Redmond', 'delay' => 200],
+        ['name' => 'Renton', 'delay' => 250],
+        ['name' => 'Kirkland', 'delay' => 300],
+        ['name' => 'Lynwood', 'delay' => 350],
+        ['name' => 'Nearby Areas', 'delay' => 400]
+      ];
+      @endphp
+
+      @foreach ($locations as $location)
+      <div
+        class="flex items-center bg-slate-800/70 border border-slate-700 rounded-xl px-5 py-4 shadow-lg shadow-sky-900/20 space-x-4 hover:shadow-sky-500/30 transition-all duration-300"
+        data-aos="fade-up"
+        data-aos-delay="{{ $location['delay'] }}"
+      >
+        <svg class="w-8 h-8 text-sky-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M12 11c1.657 0 3-1.343 3-3S13.657 5 12 5s-3 1.343-3 3 1.343 3 3 3Zm0 0c-4 0-6 4-6 6h12c0-2-2-6-6-6Z" />
+        </svg>
+        <span class="text-lg font-semibold text-slate-100">{{ $location['name'] }}</span>
+      </div>
+      @endforeach
+    </div>
+
+    <div class="text-center mt-12 md:mt-16" data-aos="fade-up" data-aos-delay="500">
+      <a href="/services"
+        class="inline-block px-8 py-3.5 bg-sky-500 text-white text-sm font-semibold uppercase rounded-lg shadow-lg shadow-sky-500/30
+               transform transition-all duration-300 ease-in-out
+               hover:bg-sky-600 hover:scale-105 active:scale-95">
+        Book in Your Area
+      </a>
+    </div>
+  </div>
+</section>
+
+
 <section id="company-presentation-video" class="bg-black text-slate-200 py-16 md:py-20">
   <div class="container mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center mb-10 md:mb-16 max-w-3xl mx-auto">
@@ -1146,25 +1195,48 @@
       </p>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 xl:gap-12 items-stretch"> {{-- items-stretch para igualar altura de contenedores hijos directos --}}
-
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 xl:gap-12 items-stretch">
+      <!-- Columna de mapas con dos ubicaciones y encabezados -->
       <div class="bg-slate-800/60 backdrop-blur-sm border border-slate-700 rounded-2xl shadow-2xl shadow-sky-900/20 overflow-hidden min-h-[26rem] sm:min-h-[30rem] lg:h-full flex flex-col" data-aos="fade-right" data-aos-duration="800">
-        {{-- REEMPLAZA ESTE SRC CON TU URL DE GOOGLE MAPS REAL --}}
-        {{-- Considera usar Google Maps Embed API para un control de estilo 'dark mode' si es posible --}}
+        <!-- Encabezado Renton -->
+        <div class="bg-slate-700/70 py-2">
+          <p class="text-center text-sky-300 font-semibold">Renton Office<br><span class="text-sm text-slate-200">11925 SE 175th St, Renton, WA 98058</span></p>
+        </div>
+        <!-- Mapa Renton -->
         <iframe
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3901.9313692477837!2d-77.04840068518728!3d-12.047920991469778!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9105c8b5d7fda2ff%3A0x20f0aaa8c7afebb!2sPlaza%20Mayor%20de%20Lima!5e0!3m2!1ses-419!2spe!4v1678886500000!5m2!1ses-419!2spe"
-          class="w-full h-full border-0 flex-grow filter grayscale-[40%] invert-[95%] contrast-[90%]"
+          src="https://maps.google.com/maps?q=11925%20SE%20175th%20St%2C%20Renton%2C%20WA%2098058%2C%20United%20States&output=embed"
+          class="w-full flex-1 border-0 filter grayscale-[40%] invert-[95%] contrast-[90%]"
           allowfullscreen=""
           loading="lazy"
           referrerpolicy="no-referrer-when-downgrade"
-          title="Service Area Map"></iframe>
+          title="Renton Location">
+        </iframe>
+
+        <!-- Divisor horizontal -->
+        <div class="h-px bg-slate-700/50"></div>
+
+        <!-- Encabezado Bellevue -->
+        <div class="bg-slate-700/70 py-2">
+          <p class="text-center text-sky-300 font-semibold">Bellevue Office<br><span class="text-sm text-slate-200">10621 NE 12th St, Bellevue, WA 98004</span></p>
+        </div>
+        <!-- Mapa Bellevue -->
+        <iframe
+          src="https://maps.google.com/maps?q=10621%20NE%2012th%20St%2C%20Bellevue%2C%20WA%2098004%2C%20United%20States&output=embed"
+          class="w-full flex-1 border-0 filter grayscale-[40%] invert-[95%] contrast-[90%]"
+          allowfullscreen=""
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          title="Bellevue Location">
+        </iframe>
       </div>
 
+      <!-- Columna de información de contacto, ubicaciones y formulario -->
       <div class="bg-slate-800/60 backdrop-blur-sm border border-slate-700 rounded-2xl shadow-2xl shadow-sky-900/20 p-6 md:p-8 flex flex-col" data-aos="fade-left" data-aos-duration="800" data-aos-delay="150">
         <div>
           <h3 class="text-3xl font-bold text-sky-400 mb-2">Contact Information</h3>
           <p class="mb-6 text-slate-400">Reach out through your preferred channel or send us a message below.</p>
 
+          <!-- Sección de canales de contacto -->
           <div class="space-y-4 mb-6 text-slate-300">
             <a href="mailto:customer@sumacccarwash.com" class="flex items-center group">
               <svg class="w-6 h-6 text-sky-400 group-hover:text-sky-300 mr-3 transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -1180,34 +1252,43 @@
             </a>
           </div>
 
+          <!-- Redes sociales -->
           <div class="flex space-x-4 mb-8">
             <a href="https://www.facebook.com/profile.php?id=61565425006563" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-sky-400 transition-colors" title="Facebook">
               <img src="SocialNetsIcon/Facebook.png" class="h-6 w-6" alt="">
-
             </a>
             <a href="https://www.instagram.com/sumacc495/" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-sky-400 transition-colors" title="Instagram">
               <img src="SocialNetsIcon/instagram.png" class="h-6 w-6" alt="">
-
             </a>
             <a href="https://wa.link/gemzk6" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-sky-400 transition-colors" title="WhatsApp">
               <img src="SocialNetsIcon/whatssapp.png" class="h-6 w-6" alt="">
-
             </a>
             <a href="https://www.tiktok.com/@sumaccmobiledetailing" target="_blank" rel="noopener noreferrer" class="text-slate-400 hover:text-sky-400 transition-colors" title="TikTok">
               <img src="SocialNetsIcon/tiktok.png" class="h-6 w-6" alt="">
-
             </a>
           </div>
 
+          <!-- Sección “We Proudly Serve” -->
           <div class="mb-8 pt-6 border-t border-slate-700/50">
             <h4 class="text-xl font-semibold text-slate-100 mb-3">We Proudly Serve:</h4>
             <div class="flex flex-wrap gap-2.5">
               @foreach (['Everett, WA', 'Redmond, WA', 'Seattle, WA', 'Bellevue, WA', 'Kirkland, WA', 'Lynnwood, WA'] as $area)
-              <span class="bg-slate-700 text-sky-300 px-3.5 py-1.5 rounded-full text-sm font-medium hover:bg-sky-500 hover:text-white transition-colors cursor-default">{{ $area }}</span>
+                <span class="bg-slate-700 text-sky-300 px-3.5 py-1.5 rounded-full text-sm font-medium hover:bg-sky-500 hover:text-white transition-colors cursor-default">{{ $area }}</span>
               @endforeach
             </div>
           </div>
         </div>
+
+        <!-- NUEVA SECCIÓN: Our Locations (visibles en el formulario) -->
+        <div class="mb-8">
+          <h4 class="text-2xl font-bold text-sky-400 mb-2">Our Locations</h4>
+          <div class="text-slate-300 space-y-1">
+            <p><span class="font-semibold text-sky-300">Renton:</span> 11925 SE 175th St, Renton, WA 98058</p>
+            <p><span class="font-semibold text-sky-300">Bellevue:</span> 10621 NE 12th St, Bellevue, WA 98004</p>
+          </div>
+        </div>
+
+        <!-- Formulario de contacto -->
         <div class="flex-grow flex flex-col">
           <form id="contactForm" class="space-y-5 flex-grow flex flex-col" data-aos="fade-up" data-aos-delay="100">
             <div>
@@ -1230,7 +1311,7 @@
               <textarea name="message" id="contact_message" rows="4" placeholder="Tell us how we can help you..." required
                 class="w-full bg-slate-700 border-slate-600 rounded-lg px-4 py-3 placeholder-slate-500 text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-colors"></textarea>
             </div>
-            <div class="mt-auto pt-2"> {{-- mt-auto para empujar el botón hacia abajo --}}
+            <div class="mt-auto pt-2">
               <button type="submit"
                 class="w-full mt-2 bg-sky-500 text-white uppercase font-bold rounded-lg px-6 py-3.5 hover:bg-sky-600 active:scale-95 transition-all duration-200 shadow-lg shadow-sky-500/30 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:ring-offset-slate-800">
                 Send Message

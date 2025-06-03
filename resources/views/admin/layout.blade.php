@@ -15,6 +15,7 @@
         rel="stylesheet"
     />
 
+    <link rel="icon" href="{{ asset('logo/favicon.ico') }}" type="image/ico" />
 
     <!-- Vite-compiled CSS/JS -->
     @vite([

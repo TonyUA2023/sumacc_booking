@@ -44,7 +44,7 @@
     {{-- <meta name="twitter:site" content="@tuUsuarioTwitter"> --}}
 
     {{-- Favicon y Theme Color --}}
-    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml" />
+    <link rel="icon" href="{{ asset('logo/favicon.ico') }}" type="image/ico" />
     {{-- Considera añadir más favicons para compatibilidad: apple-touch-icon, etc. --}}
     <meta name="theme-color" content="#0F172A"> {{-- Un color oscuro de tu paleta (ej. slate-900) --}}
 
