@@ -54,6 +54,11 @@ Route::post('/client-addresses', [ClientAddressController::class, 'store']);
 // Show one appointment’s details (GET /appointments/{id})
 Route::get('/appointments/{id}', [AppointmentController::class, 'show']);
 
+// Show the contact page (GET /contact)
+Route::get('/contact', function () {
+    return view('public.contact');
+})->name('contact');
+
 
 /*
 |--------------------------------------------------------------------------
