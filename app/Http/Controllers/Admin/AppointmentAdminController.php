@@ -4,16 +4,17 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+
 use App\Models\Appointment;
 use App\Models\AppointmentStatusHistory;
 use App\Models\ClientAddress;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use App\Models\Client;
 use App\Models\Service;
 use App\Models\VehicleType;
 use App\Models\ExtraService;
-use Carbon\Carbon;
 
 class AppointmentAdminController extends Controller
 {
@@ -23,22 +24,37 @@ class AppointmentAdminController extends Controller
     private const VALID_STATUSES = [
         'Pending',
         'Accepted',
-        'Confirmed',
-        'Scheduled',
-        'In Progress',
-        'Completed',
-        'Cancelled',
         'Rejected',
+        'Completed',
     ];
 
     /**
      * Mostrar listado de citas (paginado, con filtro por estado opcional).
+     * Además, para cada cita agregamos un atributo "scheduled_local"
+     * en zona "America/Los_Angeles" para que el front pueda usarlo
+     * directamente al pasar el modelo al blade (Js::from).
      */
     public function index(Request $request)
     {
         $statusFilter = $request->query('status');
 
-        $query = Appointment::with(['client', 'service', 'vehicleType', 'updatedByAdmin'])
+        // Eager-load de todas las relaciones que luego usa el modal View y el modal Edit:
+        // - client
+        // - service.category (para mostrar la categoría del servicio)
+        // - vehicleType
+        // - address
+        // - extraServices.extraService (para mostrar nombre, cantidad y precio)
+        // - updatedByAdmin (para saber quién creó/modificó)
+        // - statusHistories.changedByAdmin (para el historial de cambios de estado)
+        $query = Appointment::with([
+                'client',
+                'service.category',
+                'vehicleType',
+                'address',
+                'extraServices.extraService',
+                'updatedByAdmin',
+                'statusHistories.changedByAdmin',
+            ])
             ->orderBy('scheduled_at', 'desc');
 
         if ($statusFilter && in_array($statusFilter, self::VALID_STATUSES, true)) {
@@ -46,6 +62,17 @@ class AppointmentAdminController extends Controller
         }
 
         $appointments = $query->paginate(10);
+
+        // Convertir scheduled_at (UTC) a zona local y guardarlo como "scheduled_local"
+        $appointments->getCollection()->transform(function (Appointment $appointment) {
+            $local = $appointment
+                ->scheduled_at
+                ->setTimezone('America/Los_Angeles')
+                ->format('Y-m-d H:i:s');
+
+            $appointment->scheduled_local = $local;
+            return $appointment;
+        });
 
         $clients       = Client::orderBy('last_name')->orderBy('first_name')->get();
         $services      = Service::orderBy('name')->get();
@@ -65,8 +92,8 @@ class AppointmentAdminController extends Controller
     }
 
     /**
-     * Mostrar formulario de creación (si se usa vista independiente).
-     * En este proyecto suele usarse modal dentro de index(), por lo que podría no usarse.
+     * (Opcional) Si quisieras mostrar una página independiente de creación.
+     * En este proyecto probablemente uses un modal dentro de index(), así que puede no usarse.
      */
     public function create()
     {
@@ -86,7 +113,7 @@ class AppointmentAdminController extends Controller
     }
 
     /**
-     * Validar y guardar una nueva cita desde el formulario de Admin (o modal).
+     * Validar y guardar una nueva cita desde el formulario (o modal) de Admin.
      */
     public function store(Request $request)
     {
@@ -107,7 +134,7 @@ class AppointmentAdminController extends Controller
             'notas'               => 'nullable|string',
         ]);
 
-        // Crear nueva dirección del cliente
+        // 1) Crear nueva dirección del cliente
         $clientAddress = ClientAddress::create([
             'client_id'   => $validatedData['client_id'],
             'street'      => $validatedData['address_street'],
@@ -116,9 +143,13 @@ class AppointmentAdminController extends Controller
             'postal_code' => $validatedData['address_postal_code'],
         ]);
 
-        // Combinar fecha y hora para campo datetime
-        $scheduledAt = Carbon::parse("{$validatedData['scheduled_at_date']} {$validatedData['scheduled_at_time']}");
+        // 2) Combinar fecha + hora en zona local (America/Los_Angeles) y convertir a UTC
+        $userTz       = 'America/Los_Angeles';
+        $fechaHoraStr = "{$validatedData['scheduled_at_date']} {$validatedData['scheduled_at_time']}";
+        $scheduledAt = Carbon::createFromFormat('Y-m-d H:i', $fechaHoraStr, $userTz)
+                            ->setTimezone('UTC');
 
+        // 3) Crear Appointment
         $appointment = Appointment::create([
             'client_id'           => $validatedData['client_id'],
             'address_id'          => $clientAddress->id,
@@ -131,13 +162,12 @@ class AppointmentAdminController extends Controller
             'updated_by_admin_id' => Auth::guard('admin')->id(),
         ]);
 
-        // Guardar servicios extra si se seleccionaron
+        // 4) Guardar servicios extra usando la relación del modelo (extraServices())
         if (!empty($validatedData['extras'])) {
             foreach ($validatedData['extras'] as $extraId) {
                 $extraService = ExtraService::find($extraId);
                 if ($extraService) {
-                    \App\Models\AppointmentExtraService::create([
-                        'appointment_id'   => $appointment->id,
+                    $appointment->extraServices()->create([
                         'extra_service_id' => $extraService->id,
                         'quantity'         => 1,
                         'unit_price'       => $extraService->price,
@@ -152,7 +182,8 @@ class AppointmentAdminController extends Controller
     }
 
     /**
-     * Mostrar detalles de una cita (vista separada).
+     * Mostrar detalles de una cita en una vista /show (si se usa).
+     * (Aunque generalmente usamos el modal, lo dejamos para referencia.)
      */
     public function show(Appointment $appointment)
     {
@@ -163,7 +194,7 @@ class AppointmentAdminController extends Controller
             'vehicleType',
             'extraServices.extraService',
             'updatedByAdmin',
-            'statusHistories'
+            'statusHistories.changedByAdmin',
         ]);
 
         return view('admin.appointments.show', compact('appointment'));
@@ -171,6 +202,8 @@ class AppointmentAdminController extends Controller
 
     /**
      * Preparar datos para editar una cita (redirige a index con datos en sesión).
+     * Usamos un modal en index(), así que pasamos $appointment a sesión y 
+     * redirigimos con una bandera para “abrir el modal de edición”.
      */
     public function edit(Appointment $appointment)
     {
@@ -180,6 +213,31 @@ class AppointmentAdminController extends Controller
         $extraServices = ExtraService::orderBy('name')->get();
         $statuses      = self::VALID_STATUSES;
 
+        // Cargamos todas las relaciones necesarias (para rellenar el formulario):
+        $appointment->load([
+            'client',
+            'address',
+            'service',
+            'vehicleType',
+            'extraServices.extraService',
+        ]);
+
+        // Convertir scheduled_at (UTC) a local para rellenar el form de fecha/hora
+        $localDate = $appointment->scheduled_at
+                        ->setTimezone('America/Los_Angeles')
+                        ->format('Y-m-d');
+        $localTime = $appointment->scheduled_at
+                        ->setTimezone('America/Los_Angeles')
+                        ->format('H:i');
+        $appointment->scheduled_at_date = $localDate;
+        $appointment->scheduled_at_time = $localTime;
+
+        // IDs de extras existentes, para marcar checkbox en el form
+        $appointment->extrasArray = $appointment->extraServices
+            ->map(fn($es) => (string) $es->extra_service_id)
+            ->toArray();
+
+        // Pasar todo a la sesión para luego abrir el modal de edición en index
         return redirect()
             ->route('admin.appointments.index')
             ->with('open_edit_modal', true)
@@ -209,7 +267,7 @@ class AppointmentAdminController extends Controller
             'notas'               => 'nullable|string',
         ]);
 
-        // Crear nueva dirección
+        // 1) Crear nueva dirección (para histórico de direcciones)
         $clientAddress = ClientAddress::create([
             'client_id'   => $validatedData['client_id'],
             'street'      => $validatedData['address_street'],
@@ -218,10 +276,15 @@ class AppointmentAdminController extends Controller
             'postal_code' => $validatedData['address_postal_code'],
         ]);
 
-        $scheduledAt = Carbon::parse("{$validatedData['scheduled_at_date']} {$validatedData['scheduled_at_time']}");
+        // 2) Combinar fecha + hora en zona local y convertir a UTC
+        $userTz       = 'America/Los_Angeles';
+        $fechaHoraStr = "{$validatedData['scheduled_at_date']} {$validatedData['scheduled_at_time']}";
+        $scheduledAt  = Carbon::createFromFormat('Y-m-d H:i', $fechaHoraStr, $userTz)
+                              ->setTimezone('UTC');
 
         DB::beginTransaction();
         try {
+            // 3) Actualizar datos de la cita
             $appointment->update([
                 'client_id'           => $validatedData['client_id'],
                 'address_id'          => $clientAddress->id,
@@ -234,14 +297,13 @@ class AppointmentAdminController extends Controller
                 'updated_by_admin_id' => Auth::guard('admin')->id(),
             ]);
 
-            // Eliminar registros previos de servicios extra y volver a crear
+            // 4) Eliminar servicios extra anteriores y recrear
             $appointment->extraServices()->delete();
             if (!empty($validatedData['extras'])) {
                 foreach ($validatedData['extras'] as $extraId) {
                     $extraService = ExtraService::find($extraId);
                     if ($extraService) {
-                        \App\Models\AppointmentExtraService::create([
-                            'appointment_id'   => $appointment->id,
+                        $appointment->extraServices()->create([
                             'extra_service_id' => $extraService->id,
                             'quantity'         => 1,
                             'unit_price'       => $extraService->price,
@@ -277,8 +339,8 @@ class AppointmentAdminController extends Controller
     }
 
     /**
-     * Actualizar únicamente el estado de la cita.
-     * Si la petición es AJAX, devuelve JSON; de lo contrario, redirige.
+     * Actualizar únicamente el estado de la cita (PATCH).
+     * Si la petición es AJAX (wantsJson), devuelve JSON; sino redirige.
      */
     public function updateStatus(Request $request, Appointment $appointment)
     {
@@ -289,6 +351,7 @@ class AppointmentAdminController extends Controller
         $oldStatus = $appointment->status;
         $newStatus = $data['new_status'];
 
+        // Si no cambió, devolver mensaje
         if ($oldStatus === $newStatus) {
             if ($request->wantsJson()) {
                 return response()->json([
@@ -301,11 +364,13 @@ class AppointmentAdminController extends Controller
 
         DB::beginTransaction();
         try {
+            // 1) Actualizar el estado en la tabla appointments
             $appointment->update([
                 'status'              => $newStatus,
                 'updated_by_admin_id' => Auth::guard('admin')->id(),
             ]);
 
+            // 2) Registrar el cambio en el historial
             AppointmentStatusHistory::create([
                 'appointment_id'      => $appointment->id,
                 'old_status'          => $oldStatus,
@@ -327,35 +392,59 @@ class AppointmentAdminController extends Controller
 
         if ($request->wantsJson()) {
             return response()->json([
-                'message' => 'Status updated successfully.',
+                'message'    => 'Status updated successfully.',
                 'new_status' => $newStatus,
             ], 200);
         }
 
         return redirect()
-            ->route('admin.appointments.show', $appointment->id)
+            ->route('admin.appointments.index')
             ->with('success', 'Appointment status updated to ' . $newStatus);
     }
 
     /**
-     * Devolver detalles de una cita en JSON (para el modal de calendario).
+     * Devolver detalles de una cita en JSON (para el modal de calendario o View).
+     * Carga todas las relaciones necesarias que tu modal usa:
+     * - client
+     * - service.category
+     * - vehicleType
+     * - address
+     * - extraServices.extraService
+     * - updatedByAdmin
+     * - statusHistories.changedByAdmin
+     * Además, agrega "scheduled_local" en zona America/Los_Angeles.
      */
     public function getAppointmentJsonDetails(Appointment $appointment)
     {
+        // Cargar relaciones faltantes
         $appointment->loadMissing([
             'client',
-            'service',
+            'service.category',
             'vehicleType',
             'address',
             'extraServices.extraService',
+            'updatedByAdmin',
+            'statusHistories.changedByAdmin',
         ]);
 
-        return response()->json($appointment);
+        // Convertir scheduled_at (UTC) a local
+        $localScheduled = $appointment
+            ->scheduled_at
+            ->setTimezone('America/Los_Angeles')
+            ->format('Y-m-d H:i:s');
+
+        // Transformar el modelo a array, luego agregar scheduled_local
+        $payload = array_merge(
+            $appointment->toArray(),
+            ['scheduled_local' => $localScheduled]
+        );
+
+        return response()->json($payload);
     }
 
     /**
-     * Devolver eventos en JSON para Toast UI Calendar (o FullCalendar).
-     * Recibe 'start' y 'end' en query string (ISO dates).
+     * Devolver eventos en JSON para FullCalendar.
+     * Recibe 'start' y 'end' en query string (YYYY-MM-DD).
      */
     public function calendarEvents(Request $request)
     {
@@ -372,10 +461,20 @@ class AppointmentAdminController extends Controller
             ->get();
 
         $events = $appointments->map(function (Appointment $appointment) {
-            $color      = '#3498db'; // Azul por defecto
-            $textColor  = '#FFFFFF';
-            $category   = 'time';     // Para eventos con hora de inicio y fin en Toast UI
-            $statusKey  = strtolower($appointment->status);
+            // Convertir cada cita de UTC a zona local (America/Los_Angeles),
+            // y formatear sin offset para que FullCalendar la interprete como hora local.
+            $startLocal = $appointment->scheduled_at
+                ->setTimezone('America/Los_Angeles')
+                ->format('Y-m-d\TH:i:s');
+            $endLocal = Carbon::parse($appointment->scheduled_at)
+                ->setTimezone('America/Los_Angeles')
+                ->addHour()
+                ->format('Y-m-d\TH:i:s');
+
+            // Colores basados en estado
+            $color     = '#3498db'; // Azul por defecto
+            $textColor = '#FFFFFF';
+            $statusKey = strtolower($appointment->status);
 
             switch ($statusKey) {
                 case 'pending':
@@ -383,54 +482,45 @@ class AppointmentAdminController extends Controller
                     $textColor = '#333333';
                     break;
                 case 'accepted':
-                case 'confirmed':
                 case 'scheduled':
                     $color = '#2ecc71'; // Verde
                     break;
                 case 'rejected':
-                case 'cancelled':
                     $color = '#e74c3c'; // Rojo
                     break;
-                case 'in progress':
-                    $color = '#9b59b6'; // Morado
-                    break;
                 case 'completed':
-                    $color = '#34495e'; // Azul oscuro/gris
+                    $color = '#34495e'; // Azul oscuro / gris
                     break;
                 default:
                     $color     = '#bdc3c7'; // Gris claro
                     $textColor = '#333333';
             }
 
-            // Duración fija 1h
-            $eventEnd = Carbon::parse($appointment->scheduled_at)->addHour();
-
             return [
-                'id'              => 'appointment-' . $appointment->id,
+                'id'              => $appointment->id,
                 'calendarId'      => 'appointments',
                 'title'           => ($appointment->client
-                                        ? $appointment->client->first_name . ' ' . $appointment->client->last_name
-                                        : 'N/A Client')
-                                    . ' - '
-                                    . ($appointment->service
-                                        ? $appointment->service->name
-                                        : 'N/A Service'),
-                'category'        => $category,
-                'start'           => $appointment->scheduled_at->toIso8601String(),
-                'end'             => $eventEnd->toIso8601String(),
-                'isReadOnly'      => true,
+                    ? $appointment->client->first_name . ' ' . $appointment->client->last_name
+                    : 'N/A Client')
+                    . ' – '
+                    . ($appointment->service
+                        ? $appointment->service->name
+                        : 'N/A Service'),
+                'start'           => $startLocal,    // e.g. "2025-06-01T12:00:00"
+                'end'             => $endLocal,      // e.g. "2025-06-01T13:00:00"
                 'backgroundColor' => $color,
                 'borderColor'     => $color,
-                'color'           => $textColor,
+                'textColor'       => $textColor,
+                'isReadOnly'      => true,
                 'raw'             => [
                     'appointment_id' => $appointment->id,
                     'status'         => $appointment->status,
                     'clientName'     => $appointment->client
-                                          ? $appointment->client->first_name . ' ' . $appointment->client->last_name
-                                          : 'N/A',
+                        ? $appointment->client->first_name . ' ' . $appointment->client->last_name
+                        : 'N/A',
                     'serviceName'    => $appointment->service
-                                          ? $appointment->service->name
-                                          : 'N/A',
+                        ? $appointment->service->name
+                        : 'N/A',
                 ],
             ];
         });

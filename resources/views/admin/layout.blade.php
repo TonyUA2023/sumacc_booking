@@ -12,7 +12,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
         @vite([
     'resources/css/app.css',
@@ -23,7 +22,8 @@
         [x-cloak] { display: none !important; }
     </style>
 
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.5/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/min/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment-timezone@0.5.43/builds/moment-timezone-with-data.min.js"></script>
 </head>
 <body class="bg-gray-100 text-gray-800 antialiased">
 
@@ -67,16 +67,33 @@
                             <span>Clients</span>
                         </a>
                     </li>
-                     <li>
-                        <a href="#" class="flex items-center px-2 py-2.5 text-sm font-medium rounded-md transition-colors duration-150 text-gray-300 hover:bg-gray-700 hover:text-white">
-                            <svg class="w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M17 17C17 14.2386 14.7614 12 12 12C9.23858 12 7 14.2386 7 17C7 17.5523 7.44772 18 8 18H16C16.5523 18 17 17.5523 17 17ZM12 2C14.7614 2 17 4.23858 17 7C17 9.76142 14.7614 12 12 12C9.23858 12 7 9.76142 7 7C7 4.23858 9.23858 2 12 2Z"></path></svg>
-                            <span>Users</span>
-                        </a>
-                    </li>
+
+                    @if(Auth::guard('admin')->check())
+                        <li>
+                            <a href="{{ route('admin.users.index') }}" class="flex items-center px-2 py-2.5 text-sm font-medium rounded-md transition-colors duration-150 text-gray-300 hover:bg-gray-700 hover:text-white">
+                                <svg class="w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M17 17C17 14.2386 14.7614 12 12 12C9.23858 12 7 14.2386 7 17C7 17.5523 7.44772 18 8 18H16C16.5523 18 17 17.5523 17 17ZM12 2C14.7614 2 17 4.23858 17 7C17 9.76142 14.7614 12 12 12C9.23858 12 7 9.76142 7 7C7 4.23858 9.23858 2 12 2Z"></path></svg>
+                                <span>Users</span>
+                            </a>
+                        </li>
+
+                        <li>
+                            <a href="{{ route('admin.extra-services.index') }}"
+                            class="flex items-center px-2 py-2.5 text-sm font-medium rounded-md transition-colors duration-150 {{ request()->routeIs('admin.extra-services.*') ? 'bg-blue-600 text-white hover:bg-blue-700' : 'text-gray-300 hover:bg-gray-700 hover:text-white' }}">
+                                <svg class="w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    {{-- Ícono genérico (por ejemplo, un signo “+” dentro de un círculo) --}}
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 4v16m8-8H4" />
+                                </svg>
+                                <span>Extra Services</span>
+                            </a>
+                        </li>
+                    @endif
+
                     {{-- Separador --}}
                     <li class="my-4 border-t border-gray-700"></li>
                     <li>
-                        <a href="#" class="flex items-center px-2 py-2.5 text-sm font-medium rounded-md transition-colors duration-150 text-gray-300 hover:bg-gray-700 hover:text-white">
+                        <a href="{{ route('admin.settings.edit') }}"  class="flex items-center px-2 py-2.5 text-sm font-medium rounded-md transition-colors duration-150 text-gray-300 hover:bg-gray-700 hover:text-white">
                            <svg class="w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1C11.4477 1 11 1.44772 11 2V3.05493C7.51066 3.55002 4.95201 5.81079 4.18005 8.99834C4.06225 9.45368 4.30443 9.90091 4.75977 10.0187C5.21512 10.1365 5.66235 9.89433 5.78014 9.439C6.33577 7.04444 8.38034 5.30071 10.8358 5.03818C10.9138 5.03051 11 5.02746 11 5.02746V5C11 4.44772 11.4477 4 12 4C12.5523 4 13 4.44772 13 5V5.02746C13 5.02746 13.0862 5.03051 13.1642 5.03818C15.6197 5.30071 17.6642 7.04444 18.2199 9.439C18.3377 9.89433 18.7849 10.1365 19.2402 10.0187C19.6956 9.90091 19.9377 9.45368 19.8199 8.99834C19.048 5.81079 16.4893 3.55002 13 3.05493V2C13 1.44772 12.5523 1 12 1ZM12 23C12.5523 23 13 22.5523 13 22V20.9451C16.4893 20.45 19.048 18.1892 19.8199 15.0017C19.9377 14.5463 19.6956 14.0991 19.2402 13.9813C18.7849 13.8635 18.3377 14.1057 18.2199 14.561C17.6642 16.9556 15.6197 18.6993 13.1642 18.9618C13.0862 18.9695 13 18.9725 13 18.9725V19C13 19.5523 12.5523 20 12 20C11.4477 20 11 19.5523 11 19V18.9725C11 18.9725 10.9138 18.9695 10.8358 18.9618C8.38034 18.6993 6.33577 16.9556 5.78014 14.561C5.66235 14.1057 5.21512 13.8635 4.75977 13.9813C4.30443 14.0991 4.06225 14.5463 4.18005 15.0017C4.95201 18.1892 7.51066 20.45 11 20.9451V22C11 22.5523 11.4477 23 12 23ZM23 12C23 11.4477 22.5523 11 22 11H20.9451C20.45 7.51066 18.1892 4.95201 15.0017 4.18005C14.5463 4.06225 14.0991 4.30443 13.9813 4.75977C13.8635 5.21512 14.1057 5.66235 14.561 5.78014C16.9556 6.33577 18.6993 8.38034 18.9618 10.8358C18.9695 10.9138 18.9725 11 18.9725 11H19C19.5523 11 20 11.4477 20 12C20 12.5523 19.5523 13 19 13H18.9725C18.9725 13 18.9695 13.0862 18.9618 13.1642C18.6993 15.6197 16.9556 17.6642 14.561 18.2199C14.1057 18.3377 13.8635 18.7849 13.9813 19.2402C14.0991 19.6956 14.5463 19.9377 15.0017 19.8199C18.1892 19.048 20.45 16.4893 20.9451 13H22C22.5523 13 23 12.5523 23 12ZM1 12C1 12.5523 1.44772 13 2 13H3.05493C3.55002 16.4893 5.81079 19.048 8.99834 19.8199C9.45368 19.9377 9.90091 19.6956 10.0187 19.2402C10.1365 18.7849 9.89433 18.3377 9.439 18.2199C7.04444 17.6642 5.30071 15.6197 5.03818 13.1642C5.03051 13.0862 5.02746 13 5.02746 13H5C4.44772 13 4 12.5523 4 12C4 11.4477 4.44772 11 5 11H5.02746C5.02746 11 5.03051 10.9138 5.03818 10.8358C5.30071 8.38034 7.04444 6.33577 9.439 5.78014C9.89433 5.66235 10.1365 5.21512 10.0187 4.75977C9.90091 4.30443 9.45368 4.06225 8.99834 4.18005C5.81079 4.95201 3.55002 7.51066 3.05493 11H2C1.44772 11 1 11.4477 1 12Z"></path></svg>
                             <span>Settings</span>
                         </a>

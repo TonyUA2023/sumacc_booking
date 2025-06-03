@@ -13,18 +13,18 @@ use App\Http\Controllers\PageController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
 use App\Http\Controllers\Admin\ClientController as AdminClientController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\ExtraServiceController as AdminExtraServiceController;
+
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
 */
 
+// Rutas públicas
 Route::get('/', function () {
     return view('public.index');
 })->name('public.home');
@@ -33,89 +33,160 @@ Route::get('/services', [PageController::class, 'servicesPage'])
      ->name('services.page');
 
 Route::get('/services/{service}/book', [BookingController::class, 'create'])
-    ->name('services.book');
+     ->name('services.book');
 
-// Ruta pública para guardar citas creadas por clientes
+// Guardar cita desde formulario público
 Route::post('/appointments', [BookingController::class, 'store'])
-     ->name('appointments.store'); // Esta es la que usa el formulario público
+     ->name('appointments.store');
 
 Route::get('/booking/unavailable-times', [BookingController::class, 'getUnavailableTimesForDate'])
      ->name('booking.unavailable_times');
 
-// List all extra services (GET /extra-services)
+// Extra services públicos
 Route::get('/extra-services', [ExtraServiceController::class, 'index']);
 
-// Create or retrieve a client by email (POST /clients)
+// Crear o recuperar cliente por correo
 Route::post('/clients', [ClientController::class, 'storeOrGet']);
 
-// Create a new address for a client (POST /client-addresses)
+// Crear nueva dirección para cliente
 Route::post('/client-addresses', [ClientAddressController::class, 'store']);
 
-// Show one appointment’s details (GET /appointments/{id})
+// Mostrar detalle de cita pública
 Route::get('/appointments/{id}', [AppointmentController::class, 'show']);
 
 
-/*
-|--------------------------------------------------------------------------
-| Admin Routes
-|--------------------------------------------------------------------------
-*/
-
+// Rutas de administración
 Route::prefix('admin')->name('admin.')->group(function () {
 
-    // Admin Login Form (GET /admin/login)
+    // Login administrador
     Route::get('/login', [AdminAuthController::class, 'showLoginForm'])->name('login');
-
-    // Process Login (POST /admin/login)
     Route::post('/login', [AdminAuthController::class, 'login'])->name('login.submit');
 
-    // Protected admin routes
+    // Protegidas por auth:admin
     Route::middleware('auth:admin')->group(function () {
 
-        // Dashboard (GET /admin/dashboard)
-        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        // Dashboard y Logout
+        Route::get('/dashboard', [DashboardController::class, 'index'])
+             ->name('dashboard');
         Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
+
+        // ---------------------------------------------------
+        // CRUD de Appointments (admin)
+        // ---------------------------------------------------
+        Route::get('/appointments', [AppointmentAdminController::class, 'index'])
+            ->name('appointments.index');
+        Route::get('/appointments/create', [AppointmentAdminController::class, 'create'])
+            ->name('appointments.create');
+        Route::post('/appointments', [AppointmentAdminController::class, 'store'])
+            ->name('appointments.store');
+        Route::get('/appointments/{appointment}', [AppointmentAdminController::class, 'show'])
+            ->name('appointments.show');
+        Route::get('/appointments/{appointment}/edit', [AppointmentAdminController::class, 'edit'])
+            ->name('appointments.edit');
+        Route::put('/appointments/{appointment}', [AppointmentAdminController::class, 'update'])
+            ->name('appointments.update');
+        Route::delete('/appointments/{appointment}', [AppointmentAdminController::class, 'destroy'])
+            ->name('appointments.destroy');
+
+        // ------------ 
+        // JSON / AJAX 
+        // ------------
+
+        // 1) Eventos para FullCalendar:
+        //    → URI final: /admin/api/calendar-events
+        //    → Nombre de ruta: admin.api.calendar.events
+        Route::get('/api/calendar-events', [AppointmentAdminController::class, 'calendarEvents'])
+            ->name('api.calendar.events');
+
+        // 2) Detalles de una cita (JSON) para el modal:
+        //    → URI final: /admin/api/appointments/{appointment}/details
+        //    → Nombre de ruta: admin.api.appointments.details
+        Route::get('/api/appointments/{appointment}/details',
+            [AppointmentAdminController::class, 'getAppointmentJsonDetails'])
+            ->name('api.appointments.details');
+
+        // 3) Actualizar sólo estado (PATCH):
+        //    → URI final: /admin/appointments/{appointment}/status
+        //    → Nombre de ruta: admin.appointments.updateStatus
+        Route::patch('/appointments/{appointment}/status',
+            [AppointmentAdminController::class, 'updateStatus'])
+            ->name('appointments.updateStatus');
+        // ----------------------------
+        // Rutas CRUD para Services (Admin)
+        // ----------------------------
+        Route::get('/services', [AdminServiceController::class, 'index'])
+             ->name('services.index');
+        Route::get('/services/create', [AdminServiceController::class, 'create'])
+             ->name('services.create');
+        Route::post('/services', [AdminServiceController::class, 'store'])
+             ->name('services.store');
+        Route::get('/services/{service}', [AdminServiceController::class, 'show'])
+             ->name('services.show');
+        Route::get('/services/{service}/edit', [AdminServiceController::class, 'edit'])
+             ->name('services.edit');
+        Route::put('/services/{service}', [AdminServiceController::class, 'update'])
+             ->name('services.update');
+        Route::delete('/services/{service}', [AdminServiceController::class, 'destroy'])
+             ->name('services.destroy');
+
+        // ----------------------------
+        // CRUD Clients (Admin)
+        // ----------------------------
+        Route::get('/clients', [AdminClientController::class, 'index'])
+             ->name('clients.index');
+        Route::get('/clients/create', [AdminClientController::class, 'create'])
+             ->name('clients.create');
+        Route::post('/clients', [AdminClientController::class, 'store'])
+             ->name('clients.store');
+        Route::get('/clients/{client}', [AdminClientController::class, 'show'])
+             ->name('clients.show');
+        Route::get('/clients/{client}/edit', [AdminClientController::class, 'edit'])
+             ->name('clients.edit');
+        Route::put('/clients/{client}', [AdminClientController::class, 'update'])
+             ->name('clients.update');
+        Route::delete('/clients/{client}', [AdminClientController::class, 'destroy'])
+             ->name('clients.destroy');
+
+
+                // ----------------------------
+        // CRUD Users (Admin)
+        // ----------------------------
+        Route::get('/users', [AdminUserController::class, 'index'])
+             ->name('users.index');
+        Route::get('/users/create', [AdminUserController::class, 'create'])
+             ->name('users.create');
+        Route::post('/users', [AdminUserController::class, 'store'])
+             ->name('users.store');
+        Route::get('/users/{user}', [AdminUserController::class, 'show'])
+             ->name('users.show');
+        Route::get('/users/{user}/edit', [AdminUserController::class, 'edit'])
+             ->name('users.edit');
+        Route::put('/users/{user}', [AdminUserController::class, 'update'])
+             ->name('users.update');
+        Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])
+             ->name('users.destroy');
+
+        Route::get('/settings', [SettingsController::class, 'edit'])
+             ->name('settings.edit');
+        Route::put('/settings', [SettingsController::class, 'update'])
+             ->name('settings.update');
         
-        Route::get('/appointments', [AppointmentAdminController::class, 'index'])->name('appointments.index');
-        Route::get('/appointments/create', [AppointmentAdminController::class, 'create'])->name('appointments.create');
-        Route::post('/appointments', [AppointmentAdminController::class, 'store'])->name('appointments.store'); // Esta ruta podría tener el mismo nombre que la pública, pero está en el grupo admin.
-        Route::get('/appointments/{id}', [AppointmentAdminController::class, 'show'])->name('appointments.show');
-        Route::get('/appointments/{appointment}/edit', [AppointmentAdminController::class, 'edit'])->name('appointments.edit');
-        Route::put('/appointments/{appointment}', [AppointmentAdminController::class, 'update'])->name('appointments.update');
-        Route::delete('/appointments/{appointment}', [AppointmentAdminController::class, 'destroy'])->name('appointments.destroy');
-        Route::get('/admin/api/calendar-events', [AppointmentAdminController::class, 'calendarEvents'])
-        // Ruta para obtener eventos para el calendario (Toast UI Calendar u otros)
-            ->name('admin.api.calendar.events');
-        Route::get('/api/calendar-events', [AppointmentAdminController::class, 'calendarEvents'])->name('api.calendar.events');
+        // CRUD Extra Services (Admin)
+        Route::get('/extra-services', [AdminExtraServiceController::class, 'index'])
+             ->name('extra-services.index');
+        Route::get('/extra-services/create', [AdminExtraServiceController::class, 'create'])
+             ->name('extra-services.create');
+        Route::post('/extra-services', [AdminExtraServiceController::class, 'store'])
+             ->name('extra-services.store');
+        Route::get('/extra-services/{extraService}', [AdminExtraServiceController::class, 'show'])
+             ->name('extra-services.show');
+        Route::get('/extra-services/{extraService}/edit', [AdminExtraServiceController::class, 'edit'])
+             ->name('extra-services.edit');
+        Route::put('/extra-services/{extraService}', [AdminExtraServiceController::class, 'update'])
+             ->name('extra-services.update');
+        Route::delete('/extra-services/{extraService}', [AdminExtraServiceController::class, 'destroy'])
+             ->name('extra-services.destroy');
 
-        // NUEVA RUTA para obtener detalles de una cita en JSON para el modal de visualización desde el calendario
-        Route::get('/api/appointments/{appointment}/details', [AppointmentAdminController::class, 'getAppointmentJsonDetails'])->name('api.appointments.details');
-
-        // Actualizar solamente el estado de la cita:
-        Route::put('appointments/{id}/status', [AppointmentAdminController::class, 'updateStatus'])
-            ->name('appointments.updateStatus'); // Mantenida por si se usa en algún lugar.
-        Route::patch('/appointments/{id}/status', [AppointmentAdminController::class, 'updateStatus']) //  PATCH es más semántico para actualizaciones parciales
-             ->name('appointments.updateStatusPatch'); // Cambié el nombre para evitar conflicto si decides mantener ambas PUT/PATCH para el mismo controller method. Si sólo usas una, puedes usar el nombre original.
-
-        // Admin Services CRUD
-        Route::get('/services', [AdminServiceController::class, 'index'])->name('services.index');
-        Route::post('/services', [AdminServiceController::class, 'store'])->name('services.store');
-        Route::get('/services/create', [AdminServiceController::class, 'create'])->name('services.create');
-        Route::get('/services/{service}', [AdminServiceController::class, 'show'])->name('services.show');
-        Route::get('/services/{service}/edit', [AdminServiceController::class, 'edit'])->name('services.edit');
-        Route::put('/services/{service}', [AdminServiceController::class, 'update'])->name('services.update');
-        Route::delete('/services/{service}', [AdminServiceController::class, 'destroy'])->name('services.destroy');
-
-        // Admin Clients CRUD
-        Route::get('/clients', [AdminClientController::class, 'index'])->name('clients.index');
-        Route::post('/clients', [AdminClientController::class, 'store'])->name('clients.store');
-        Route::get('/clients/create', [AdminClientController::class, 'create'])->name('clients.create');
-        Route::get('/clients/{client}', [AdminClientController::class, 'show'])->name('clients.show');
-        Route::get('/clients/{client}/edit', [AdminClientController::class, 'edit'])->name('clients.edit');
-        Route::put('/clients/{client}', [AdminClientController::class, 'update'])->name('clients.update');
-        Route::delete('/clients/{client}', [AdminClientController::class, 'destroy'])->name('clients.destroy');
-        
-        // ... Aquí irían otras rutas de admin como gestión de servicios, clientes, usuarios, etc. ...
-
+        // … Otras rutas de admin si son necesarias …
     });
 });
