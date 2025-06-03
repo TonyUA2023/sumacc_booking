@@ -1,7 +1,7 @@
 @extends('public.layout')
 
 @section('content')
-<section id="contact" class="bg-slate-900 pt-[2cm] pb-16">
+<section id="contact" class="bg-slate-900 pt-20 pb-16">
   <div class="container mx-auto px-4 lg:px-8">
     <div class="flex flex-col lg:flex-row gap-8 items-stretch">
       {{-- =======================================================
@@ -38,7 +38,7 @@
               type="email"
               id="email"
               name="email"
-              placeholder="you@example.com"
+              placeholder="customer@sumacccarwash.com"
               class="w-full bg-slate-700 text-white placeholder-slate-400 
                      border-b-2 border-transparent focus:border-sky-500 transition-colors 
                      ease-in-out duration-200 py-2 rounded-t-md"
@@ -64,7 +64,7 @@
           {{-- Campo: Mensaje --}}
           <div>
             <label for="message" class="block text-sm font-medium text-sky-200 mb-1">
-              How can we help you?
+              How can i help you?
             </label>
             <textarea
               id="message"
@@ -80,7 +80,7 @@
           {{-- Selector: Método de envío --}}
           <div>
             <label for="method" class="block text-sm font-medium text-sky-200 mb-1">
-              Send via
+              Send me on
             </label>
             <select
               id="method"
@@ -175,7 +175,7 @@
           <div class="space-y-4 text-slate-200">
             <p>United States —</p>
             <p>24003 50th Pl<br>Mountlake Terrace, WA 98043</p>
-            <p class="text-sky-400 font-medium">customer@example.com</p>
+            <p class="text-sky-400 font-medium">customer@sumacccarwash.com</p>
             <p class="text-sky-500 font-semibold">(425) 332-0815</p>
           </div>
         </div>

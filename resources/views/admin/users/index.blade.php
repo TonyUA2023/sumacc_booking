@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 {{-- resources/views/admin/users/index.blade.php --}}
 @extends('admin.layout')
 
@@ -589,14 +588,4 @@
         Alpine.data('usersPageData', usersPageData);
     });
 </script>
-=======
-@extends('admin.layout')
-
-@section('title', 'Manage Services - SUMACC Admin')
-@section('page-title', 'Services Management')
-
-@section('content')
-<h1>Esta es la pagina de clientes</h1>
-
->>>>>>> e4c35a997968a6d16322236953a65c25718c23d4
 @endsection

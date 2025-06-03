@@ -19,16 +19,31 @@
   class="fixed top-0 w-full z-[999] transition-all duration-300 ease-in-out"
   data-aos="fade-down" data-aos-duration="700"
 >
-  <div class="container mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8 transition-all duration-300 ease-in-out">
+  <div class="container mx-auto flex items-center justify-between px-4 sm:px-6  transition-all duration-300 ease-in-out">
     
-    {{-- Logo --}}
-    <a href="{{ route('public.home') }}#home" class="flex items-center gap-3" data-aos="fade-right" data-aos-delay="100" data-aos-duration="700">
-      <img src="{{ asset('media/logosumacc.svg') }}" alt="SUMACC Logo" class="w-10 h-10 md:w-12 md:h-12 transition-all duration-300" />
-      <div>
-        <span class="block text-xl md:text-2xl font-extrabold text-sky-500">SUMACC</span>
-        <span class="block text-xs font-medium text-slate-300" :class="scrolled ? 'text-slate-400' : 'text-slate-300'">Luxe Mobile Wash LLC</span>
-      </div>
-    </a>
+{{-- Logo --}}
+<a
+  href="{{ route('public.home') }}#home"
+  class="flex items-center gap-2"
+  data-aos="fade-right"
+  data-aos-delay="100"
+  data-aos-duration="700"
+>
+  <img
+    src="{{ asset('logo/logoSumacc.png') }}"
+    alt="SUMACC Logo"
+    class="h-6 w-6 md:h-10 md:w-10 transition-all duration-300"
+  />
+  <div class="flex flex-col leading-tight">
+    <span class="text-xl md:text-2xl font-extrabold text-sky-500">SUMACC</span>
+    <span
+      class="text-xs font-medium text-slate-300 mt-0"
+      :class="scrolled ? 'text-slate-400' : 'text-slate-300'"
+    >
+      Luxe Mobile Wash LLC
+    </span>
+  </div>
+</a>
 
     {{-- Nav Desktop --}}
     <nav class="hidden md:flex items-center gap-6 lg:gap-8 uppercase font-medium tracking-wider">
