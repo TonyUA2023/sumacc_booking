@@ -36,7 +36,8 @@
         $navItems = [
           ['/#home','Home', true],
           ['/services','Services', true],
-          ['/contact','Contact', true]
+          ['/contact','Contact', true],
+          ['/extra-services','extra services', true]
         ];
       @endphp
       @foreach ($navItems as $index => $item)

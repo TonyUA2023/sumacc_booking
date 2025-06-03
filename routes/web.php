@@ -56,8 +56,13 @@ Route::get('/appointments/{id}', [AppointmentController::class, 'show']);
 
 // Show the contact page (GET /contact)
 Route::get('/contact', function () {
-    return view('public.contact');
-})->name('contact');
+     return view('public.contact');
+ })->name('contact');
+
+ // Show the contact page (GET /contact)
+Route::get('/extra-services', function () {
+     return view('public.extra-services');
+ })->name('extra-servicesct');
 
 
 // Rutas de administración
