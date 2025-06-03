@@ -183,12 +183,4 @@
     </div>
   </div>
 </section>
-
-
-
-
-
-
-
-
 @endsection
